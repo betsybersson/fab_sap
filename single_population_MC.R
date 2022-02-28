@@ -58,14 +58,13 @@ for ( j in 1:n_N){
          xlab = expression(theta), ylab = "Expected Interval Width Ratio",
          ylim = c(range(mean.mat,1.01)),
          type="l",cex.axis=1.5,cex.lab=1.5)
-    title("(c)", adj = .05, line = 1,cex.main=2)
+    title("(b)", adj = .05, line = 1,cex.main=2)
     abline(h=1,lty="dashed")
     
     min.val = min(mean.mat)
   }
   
   lines(MU.VAL,(mean.mat),lwd=2,col=cols[j])
-  
   
 }
 dev.off()
@@ -77,13 +76,12 @@ for ( j in 1:n_N){
   
   mean.mat = mc_mean_out[j,,2]/mc_mean_out[j,,3]
   
-  
   if(j==1){
     plot(MU.VAL,mean.mat,
          xlab = expression(theta), ylab = "Expected Interval Width Ratio",
          ylim = c(range(mean.mat,1.01)),
          type="l",cex.axis=1.5,cex.lab=1.5)
-    title("(d)", adj = .05, line = 1,cex.main=2)
+    title("(c)", adj = .05, line = 1,cex.main=2)
     abline(h=1,lty="dashed")
   }
   
@@ -96,14 +94,19 @@ dev.off()
 ## plot pred interval bounds
 pdf("./single_pop_varymu_bounds.pdf",family="Times",height = 7,width = 6.6)
 make.mat = cbind(bounds[1,,-2],bounds[2,,-2])
-cols = c("grey","black")
-matplot(MU.VAL,(make.mat),
-        xlab = expression(theta), ylab = "Prediction Interval Endpoints",
-        col = rep(cols,2), type="l",lwd=c(3,1.5,3,1.5),
-        lty = 1,cex.axis=1.5,cex.lab=1.5)
-title("(a)", adj = .05, line = 1,cex.main=2)
+cols = c("grey","black"); cols = rep(cols,2); wds = c(3,1.5,3,1.5)
+plot(MU.VAL,make.mat[,1],
+     pch="",
+     xlab = expression(theta), ylab = "Prediction Interval Endpoints",
+     ylim = range(make.mat),
+     lty = 1,cex.axis=1.5,cex.lab=1.5)
+for ( j in 1:ncol(make.mat) ){
+  lo = smooth.spline(MU.VAL,make.mat[,j])
+  lines(lo,col=cols[j],lwd=wds[j])
+}
 abline(a=0,b=1,lty="dashed")
 abline(v=0,lty="dashed")
+abline(h=0,lty="dashed")
 dev.off()
 
 
@@ -122,15 +125,13 @@ MU = 0; mu = MU
 T2 = seq(from = .05, to = 6, by = .05); n_T = length(T2)
 
 # grand sim to collect MC estimates of mean for each n, t2 pair for 2 methods
-mc_mean_out = array(NA,dim=c(n_N,n_T,5))
+mc_mean_out = array(NA,dim=c(n_N,n_T,2))
 for ( j in 1:n_N ){
   
   n = NS[j]
   
-  interval_out = array(NA,dim=c(2,S,n_T,5)) # fab, avg
+  interval_out = array(NA,dim=c(2,S,n_T,2)) # fab, avg
   for ( s in 1:S ){
-    
-    # hyperparams
     
     for ( T in 1:n_T){
       
@@ -164,11 +165,10 @@ for ( j in 1:n_N){ #n_N
          xlab = expression(tau^2), ylab = "Bayes Expected Interval Width Ratio",
          ylim = c(range(mean.mat,1.01)),
          pch="",cex.axis=1.5,cex.lab=1.5)
-    title("(b)", adj = .05, line = 1,cex.main=2)
+    title("(a)", adj = .05, line = 1,cex.main=2)
     abline(h=1,lty="dashed")
   }
   lo = smooth.spline(T2,mean.mat)
-  #lines(T2,(mean.mat),lwd=3,col=cols[j])
   lines(lo,lwd=3,col=cols[j])
   
 }
